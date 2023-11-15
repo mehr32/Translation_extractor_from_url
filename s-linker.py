@@ -5,7 +5,8 @@ import json
 def translate(text):
     source_language = 'en'
     target_language = 'fa'
-    #بخش بندی متن برای ترجمه
+    #translate section
+    #remember you should write your comments in english so people from other countries could understand what you had wrote :)
     chunks = []
     current_chunk = ""
     max_chunk_size = 5000
@@ -22,18 +23,22 @@ def translate(text):
     random_element = random.choice(servers_list)
     print(f"server: {random_element}")
 
+    translated_chunks = []  # New list to store translated chunks
+
     for i in chunks:
         url = f'https://{random_element}/api/v1/{source_language}/{target_language}/{i}'
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
             translati = data['translation']
-            data_i_terans =[]
-            data_i_terans.append(translati)
-            text = ' '.join(data_i_terans)
-            return text
+            translated_chunks.append(translati)  # Append each translation to the list
         else:
             print(response.status_code)
+
+    # Join all the translated chunks into a single text
+    text = ' '.join(translated_chunks)
+    return text  # Return the combined translation
+
 
 
 
@@ -43,27 +48,27 @@ def extract_content_from_url(url, n_file):
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
         text_ex = ""
-        h1 = soup.find_all('h1')
-        for h1 in h1:
-            content = h1.text
-            with open(n_file, "w", encoding="utf-8") as file:
+
+        with open(n_file, "a", encoding="utf-8") as file:
+            h1 = soup.find_all('h1')
+            for h1 in h1:
+                content = h1.text
                 file.write(content + "\n")
                 text_ex += content + "\n"
 
-        p = soup.find_all('p')
-        with open(n_file, "a", encoding="utf-8") as file:
+            p = soup.find_all('p')
             for paragraph in p:
                 file.write(paragraph.text + "\n" + " ")
                 text_ex += paragraph.text + "\n"
 
-        h2 = soup.find_all('h2')
-        with open(n_file, "a", encoding="utf-8") as file:
+            h2 = soup.find_all('h2')
             for header in h2:
                 file.write(header.text + "\n" + " ")
                 text_ex += header.text + "\n"
     else:
         print("Error: نمیتوان به این صفحه دسترسی داشت.")
     return text_ex
+
 
 
 def writer(text):
@@ -81,6 +86,3 @@ def run():
 
 file_surese_name = "s.txt"
 run()
-
-
-
