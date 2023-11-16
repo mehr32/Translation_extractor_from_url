@@ -19,7 +19,7 @@ def translate(text):
     if current_chunk:
         chunks.append(current_chunk)
 
-    servers_list = ["lingva.ml", "translate.plausibility.cloud", "lingva.lunar.icu"]
+    servers_list = ["lingva.ml", "lingva.lunar.icu"]
     random_element = random.choice(servers_list)
     print(f"server: {random_element}")
 
@@ -28,14 +28,27 @@ def translate(text):
     for i in chunks:
         url = f'https://{random_element}/api/v1/{source_language}/{target_language}/{i}'
         response = requests.get(url)
-        if response.status_code == 200:
+        requ_code = response.status_code
+        if requ_code == 200:
+            print("len requ: ", len(i))
+            print(response.status_code)
             data = response.json()
             translati = data['translation']
             translated_chunks.append(translati)  # Append each translation to the list
         else:
-            print(response.status_code)
+            while requ_code != 200:
+                print("error:", response.status_code)
+                print("len requ: ", len(i))
+                random_element = random.choice(servers_list)
+                print("new server:", random_element)
+                url = f'https://{random_element}/api/v1/{source_language}/{target_language}/{i}'
+                response = requests.get(url)
+                requ_code = response.status_code
 
-    # Join all the translated chunks into a single text
+            data = response.json()
+            translati = data['translation']
+            translated_chunks.append(translati)
+
     text = ' '.join(translated_chunks)
     return text  # Return the combined translation
 
